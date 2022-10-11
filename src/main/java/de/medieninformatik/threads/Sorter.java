@@ -27,7 +27,15 @@ public class Sorter<T> extends RecursiveAction {
     protected void compute() {
         if (right - left <= SWITCH_SIZE) {
             // TODO: implement insertion sort from left to right (exclusive)
-            Arrays.sort(values, left, right, comparator);
+            for (int i = left; i < right; i++) {
+                T valuesToSort = values[i];
+                int j = i;
+                while (j > left && comparator.compare(valuesToSort, values[j - 1]) < 0) {
+                    values[j] = values[j - 1];
+                    j--;
+                }
+                values[j] = valuesToSort; //Das kannst du dann löschen
+            }
         } else {
             final int mid = (left + right) / 2;
             final Sorter<T> leftSort = new Sorter<>(SWITCH_SIZE, values, left, mid, comparator);
