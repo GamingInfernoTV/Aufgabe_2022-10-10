@@ -1,5 +1,6 @@
 package de.medieninformatik.threads;
 
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.concurrent.RecursiveAction;
 
@@ -24,17 +25,36 @@ public class Sorter<T> extends RecursiveAction {
 
     @Override
     protected void compute() {
-        if (left < right + SWITCH_SIZE) {
-            // TODO: insertion sort
-        }
-        else {
+        if (right - left <= SWITCH_SIZE) {
+            // TODO: implement insertion sort from left to right (exclusive)
+            Arrays.sort(values, left, right, comparator);
+        } else {
             final int mid = (left + right) / 2;
             final Sorter<T> leftSort = new Sorter<>(SWITCH_SIZE, values, left, mid, comparator);
             final Sorter<T> rightSort = new Sorter<>(SWITCH_SIZE, values, mid, right, comparator);
             rightSort.fork();
             leftSort.compute();
             rightSort.join();
-            // TODO: merge sorted arrays
+            int leftSize = mid - left;
+            int rightSize = right - mid;
+
+            T[] leftArr = Arrays.copyOfRange(this.values, left, mid);
+            T[] rightArr = Arrays.copyOfRange(this.values, mid, right);
+
+            int i = 0, j = 0, k = left;
+            while (i < leftSize && j < rightSize) {
+                if (comparator.compare(leftArr[i], rightArr[j]) <= 0) {
+                    values[k++] = leftArr[i++];
+                } else {
+                    values[k++] = rightArr[j++];
+                }
+            }
+            while (i < leftSize) {
+                values[k++] = leftArr[i++];
+            }
+            while (j < rightSize) {
+                values[k++] = rightArr[j++];
+            }
         }
     }
 }

@@ -5,6 +5,7 @@ import de.medieninformatik.threads.Sorter;
 import java.util.Arrays;
 import java.util.Random;
 import java.util.concurrent.ForkJoinPool;
+import java.util.function.Consumer;
 
 public class Mainstream {
     public static void main(String[] args) {
@@ -12,17 +13,26 @@ public class Mainstream {
         final int switchSize = 100;
         final int nThreads = Runtime.getRuntime().availableProcessors();
         final Integer[] values = new Random().ints(size).boxed().toArray(Integer[]::new);
+        final Integer[] compare = Arrays.copyOf(values, values.length);
         final ForkJoinPool exec = new ForkJoinPool(nThreads);
-        Integer[] compare = Arrays.copyOf(values, values.length);
+
+        System.out.println("Sorting array using own implementation");
+        sortArray(values, arr -> exec.invoke(new Sorter<>(switchSize, arr, Integer::compareTo)));
+
+        System.out.println("Sorting array using build in sort");
+        sortArray(compare, Arrays::sort);
+
+        boolean success = Arrays.equals(values, compare);
+        System.out.printf("Sorting was%s successful%n", success ? "" : " not");
+        if (!success) {
+            System.out.println(Arrays.toString(values));
+            System.out.println(Arrays.toString(compare));
+        }
+    }
+
+    private static <T> void sortArray(T[] values, Consumer<T[]> sorter) {
         long start = System.currentTimeMillis();
-        exec.invoke(new Sorter<>(switchSize, values, Integer::compareTo));
-        long end = System.currentTimeMillis() - start;
-        System.out.println("Sorting needed: " + end);
-        start = System.currentTimeMillis();
-        Arrays.parallelSort(compare);
-        end = System.currentTimeMillis() - start;
-        System.out.println("Compare Sorting needed: " + end);
-        boolean success = Arrays.compare(values, compare) == 0;
-        System.out.printf("Sorting was%s successful", success ? "" : " not");
+        sorter.accept(values);
+        System.out.printf("Sorting needed %dms%n", System.currentTimeMillis() - start);
     }
 }
