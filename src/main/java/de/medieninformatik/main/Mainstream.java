@@ -3,19 +3,24 @@ package de.medieninformatik.main;
 import de.medieninformatik.threads.Sorter;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Random;
 import java.util.concurrent.ForkJoinPool;
 import java.util.function.Consumer;
 
+// An die Korrektur: ist die Implementation des Application-Plugins so den Anforderungen entsprechend?
+
 /**
- * @author m30114
- * @author m30115
- * */
+ * Main-Klasse zum Testen der Klasse {@link Sorter}
+ *
+ * @author Aaron Pöhlmann <code>30115</code>
+ * @author Malte Kasolowsky <code>30114</code>
+ */
 public class Mainstream {
     /**
-     *Die Main-Methode startet das Programm und legt die dafür benötigten Parameter fest.
+     * Testet {@link Sorter} mit eines Integer-Arrays und vergleicht es mit {@link Arrays#sort(Object[], Comparator)}
      *
-     * @param args
+     * @param args Nicht benutzt
      */
     public static void main(String[] args) {
         // größe des Arrays
@@ -46,11 +51,12 @@ public class Mainstream {
     }
 
     /**
-     * Die Methode dient dazu die Laufzeit des Programms zu messen und übergibt der Sorter-Klasse das
-     * zu sortierende Array
-     * @param values
-     * @param sorter
-     * @param <T>
+     * Die Methode dient dazu die Laufzeit des Programms zu messen und übergibt einem {@link Consumer},
+     * der das Array sortieren soll, das zu sortierende Array
+     *
+     * @param values das zu sortierende Array
+     * @param sorter Ein Consumer, der das Array sortieren soll
+     * @param <T>    Der Objekttyp der Elemente im Array
      */
     private static <T> void sortArray(T[] values, Consumer<T[]> sorter) {
         long start = System.currentTimeMillis();
